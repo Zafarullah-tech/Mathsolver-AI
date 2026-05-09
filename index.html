@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MathSolver AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+<!-- ══ LOADING SHIELD ══════════════════════════════════════ -->
+<div class="loading-shield" id="loadingShield">
+  <div class="spinner-wrap">
+    <div class="orbit orbit-1"></div>
+    <div class="orbit orbit-2"></div>
+    <div class="orbit orbit-3"></div>
+    <span class="core">∑</span>
+  </div>
+  <div class="loading-text" id="loadingText">Computing...</div>
+</div>
+
+<!-- ══ SYMBOL MODAL ════════════════════════════════════════ -->
+<div class="modal-overlay" id="symbolModal" onclick="if(event.target===this)closeSymbols()">
+  <div class="symbol-panel">
+    <div class="symbol-panel-head">
+      <h3>Insert Symbol</h3>
+      <button onclick="closeSymbols()">✕</button>
+    </div>
+    <div class="sym-grid">
+      <button onclick="ins('^')">^</button>
+      <button onclick="ins('*')">×</button>
+      <button onclick="ins('sqrt()')">√</button>
+      <button onclick="ins('pi')">π</button>
+      <button onclick="ins('oo')">∞</button>
+      <button onclick="ins('log()')">ln</button>
+      <button onclick="ins('exp()')">eˣ</button>
+      <button onclick="ins('sin()')">sin</button>
+      <button onclick="ins('cos()')">cos</button>
+      <button onclick="ins('tan()')">tan</button>
+      <button onclick="ins('**2')">x²</button>
+      <button onclick="ins('**3')">x³</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP SHELL ════════════════════════════════════════════ -->
+<div class="app-shell">
+
+  <!-- ── SIDEBAR ──────────────────────────────────────────── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">∑</div>
+      <span class="brand-name">MathSolver</span>
+      <!-- Inline collapse button inside sidebar -->
+      <button class="collapse-btn" onclick="toggleSidebar()" title="Collapse sidebar">◀</button>
+    </div>
+
+    <button class="new-session-btn" onclick="newChat()">
+      ＋ New Session
+    </button>
+
+    <div class="sidebar-section">
+      <p class="section-label">QUICK INSERT</p>
+      <div class="quick-grid">
+        <button class="quick-btn" onclick="insertExample('derivative')">
+          <span class="qb-icon">∂</span>Derivative
+        </button>
+        <button class="quick-btn" onclick="insertExample('integral')">
+          <span class="qb-icon">∫</span>Integral
+        </button>
+        <button class="quick-btn" onclick="insertExample('limit')">
+          <span class="qb-icon">lim</span>Limit
+        </button>
+        <button class="quick-btn" onclick="insertExample('series')">
+          <span class="qb-icon">Σ</span>Series
+        </button>
+        <button class="quick-btn" onclick="insertExample('equation')">
+          <span class="qb-icon">=</span>Equation
+        </button>
+        <button class="quick-btn" onclick="insertExample('simplify')">
+          <span class="qb-icon">≈</span>Simplify
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <p class="section-label">RECENT</p>
+      <div class="history-list" id="chatHistory">
+        <p class="empty-history">No history yet</p>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="footer-badge">
+        <span class="dot active"></span>
+        SymPy Engine Online
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── MAIN PANEL ──────────────────────────────────────── -->
+  <div class="main-panel">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <!-- ★ Fixed: id added, always visible via CSS -->
+      <button class="menu-toggle" id="menuToggleBtn" onclick="toggleSidebar()" title="Toggle sidebar">◀</button>
+
+      <div class="top-bar-title">
+        <h1>MathSolver AI</h1>
+        <div class="subtitle">Symbolic • Step-by-step • Instant</div>
+      </div>
+
+      <div class="top-bar-actions">
+        <!-- ★ New: Dark / Light mode toggle -->
+        <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Switch to Light Mode">🌙</button>
+        <button onclick="exportChat()" title="Export chat">⬇</button>
+        <button onclick="clearChat()" title="Clear chat">🗑</button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-pane" id="messagesContainer"></div>
+
+    <!-- Composer -->
+    <div class="composer">
+      <div class="composer-inner">
+        <textarea
+          id="userInput"
+          rows="1"
+          placeholder="Ask a math question… e.g. derivative of sin(x^2)"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this); updateCounter()"
+        ></textarea>
+        <div class="composer-btns">
+          <button class="sym-btn" onclick="openSymbols()" title="Insert symbol">Ω</button>
+          <button class="clr-btn" onclick="clearInput()" title="Clear">✕</button>
+          <button class="send-btn" onclick="sendMessage()" title="Send (Enter)">➤</button>
+        </div>
+      </div>
+      <div class="composer-foot">
+        <span class="hint"><i>↵</i> Send &nbsp;|&nbsp; <code>Shift+Enter</code> newline</span>
+        <span class="counter" id="charCounter">0 / 500</span>
+      </div>
+    </div>
+
+  </div><!-- /main-panel -->
+</div><!-- /app-shell -->
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

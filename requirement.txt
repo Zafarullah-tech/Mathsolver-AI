@@ -1,0 +1,4 @@
+flask
+sympy
+google-generativeai
+python-dotenv
